@@ -13,6 +13,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class _bodyBuilder extends StatefulWidget {
   _bodyBuilder({Key key}) : super(key:key);
   @override
@@ -20,20 +22,34 @@ class _bodyBuilder extends StatefulWidget {
 }
 
 class __bodyBuilderState extends State<_bodyBuilder> {
-  
-  List todos = List();
-  String input = "";
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    todos.add("item1");
-    todos.add("item2");
-  }
+  List<String> todos;
+  String input = "";
+  SharedPreferences ref;
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        ref = snapshot.data;
+        todos = ref.getStringList('todo');
+        todos ??= [];
+
+        return _buildBody();
+      },
+    );
+  }
+
+  Widget _buildBody() {
     return Scaffold(
         appBar: AppBar(
           title: Text("TodoList"),
@@ -55,6 +71,9 @@ class __bodyBuilderState extends State<_bodyBuilder> {
                           onPressed: () {
                             setState(() {
                               todos.add(input);
+                              print(todos);
+                              ref.setStringList('todo', todos);
+                              input = "";
                             });
                           },
                           child: Text("Add"),
@@ -87,6 +106,7 @@ class __bodyBuilderState extends State<_bodyBuilder> {
                           onPressed: () {
                             setState(() {
                               todos.removeAt(index);
+                              ref.setStringList('todo', todos);
                             });
                           },
                         ),
@@ -97,24 +117,23 @@ class __bodyBuilderState extends State<_bodyBuilder> {
                           ),
                           onPressed: () {
                             showDialog(context: context,
-                              builder: (BuildContext context){
-                              return AlertDialog(
-                                title: Text("Thay Đổi"),
-                                content: TextField(
-                                  onChanged: (String value){
-                                    input = value;
-                                  },
-                                ),
-                                actions: [
-                                  FlatButton(
-                                    onPressed: (){
-
-                                    },
-                                    child: Text("Xác nhận"),
-                                  )
-                                ],
-                              );
-                              }
+                                builder: (BuildContext context){
+                                  return AlertDialog(
+                                    title: Text("Thay Đổi"),
+                                    content: TextField(
+                                      onChanged: (String value){
+                                        input = value;
+                                      },
+                                    ),
+                                    actions: [
+                                      FlatButton(
+                                        onPressed: (){
+                                        },
+                                        child: Text("Xác nhận"),
+                                      )
+                                    ],
+                                  );
+                                }
                             );
                           },
                         )
@@ -125,6 +144,9 @@ class __bodyBuilderState extends State<_bodyBuilder> {
               ),
             );
           },
-        ));
+        ))
+    ;
   }
+
+
 }
