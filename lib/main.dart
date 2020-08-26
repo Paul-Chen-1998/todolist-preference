@@ -12,21 +12,15 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
 class _bodyBuilder extends StatefulWidget {
   _bodyBuilder({Key key}) : super(key:key);
   @override
   __bodyBuilderState createState() => __bodyBuilderState();
 }
-
 class __bodyBuilderState extends State<_bodyBuilder> {
-
   List<String> todos;
   String input = "";
   SharedPreferences ref;
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<SharedPreferences>(
@@ -39,7 +33,6 @@ class __bodyBuilderState extends State<_bodyBuilder> {
             ),
           );
         }
-
         ref = snapshot.data;
         todos = ref.getStringList('todo');
         todos ??= [];
@@ -55,32 +48,7 @@ class __bodyBuilderState extends State<_bodyBuilder> {
           title: Text("TodoList"),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                      title: Text("Thêm"),
-                      content: TextField(
-                        onChanged: (String value) {
-                          input = value;
-                        },
-                      ),
-                      actions: [
-                        FlatButton(
-                          onPressed: () {
-                            setState(() {
-                              todos.add(input);
-                              print(todos);
-                              ref.setStringList('todo', todos);
-                              input = "";
-                            });
-                          },
-                          child: Text("Add"),
-                        ),
-                      ]);
-                });
-          },
+            onPressed: _onPressAdd
         ),
         body: ListView.builder(
           itemCount: todos.length,
@@ -103,39 +71,14 @@ class __bodyBuilderState extends State<_bodyBuilder> {
                             Icons.delete,
                             color: Colors.red,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              todos.removeAt(index);
-                              ref.setStringList('todo', todos);
-                            });
-                          },
+                          onPressed:()=> _onPressedRemoved(index),
                         ),
                         IconButton(
                           icon: Icon(
                             Icons.update,
                             color: Colors.blue,
                           ),
-                          onPressed: () {
-                            showDialog(context: context,
-                                builder: (BuildContext context){
-                                  return AlertDialog(
-                                    title: Text("Thay Đổi"),
-                                    content: TextField(
-                                      onChanged: (String value){
-                                        input = value;
-                                      },
-                                    ),
-                                    actions: [
-                                      FlatButton(
-                                        onPressed: (){
-                                        },
-                                        child: Text("Xác nhận"),
-                                      )
-                                    ],
-                                  );
-                                }
-                            );
-                          },
+                          onPressed: () => _onPressedUpdate(index),
                         )
                       ],
                     ),
@@ -144,9 +87,69 @@ class __bodyBuilderState extends State<_bodyBuilder> {
               ),
             );
           },
-        ))
-    ;
+        ));
+  }
+  _onPressAdd(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text("Thêm"),
+              content: TextField(
+                onChanged: (String value) {
+                  input = value;
+                },
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      todos.add(input);
+                      print(todos);
+                      ref.setStringList('todo', todos);
+                      input = "";
+                    });
+                  },
+                  child: Text("Add"),
+                ),
+              ]);
+        });
   }
 
+  _onPressedRemoved(int index){
+    setState(() {
+      todos.removeAt(index);
+      ref.setStringList('todo', todos);
+    });
+  }
 
+  _onPressedUpdate(int index){
+    String todo = todos[index];
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final textController = TextEditingController(text: todo);
+          return AlertDialog(
+              title: Text("Sửa"),
+              content: TextField(
+                controller: textController,
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      print(textController.text);
+                      todos[index] = textController.text;
+                      print(todos);
+                      ref.setStringList('todo', todos);
+                      input = "";
+                    });
+                  },
+                  child: Text("Add"),
+                ),
+              ]);
+        });
+  }
 }
+
+
