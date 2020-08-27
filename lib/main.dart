@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'application.dart';
+import 'home_screen.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -48,7 +51,8 @@ class __bodyBuilderState extends State<_bodyBuilder> {
           title: Text("TodoList"),
         ),
         floatingActionButton: FloatingActionButton(
-            onPressed: _onPressAdd
+            onPressed: _OnPressAdd,
+          child: Icon(Icons.add),
         ),
         body: ListView.builder(
           itemCount: todos.length,
@@ -71,14 +75,14 @@ class __bodyBuilderState extends State<_bodyBuilder> {
                             Icons.delete,
                             color: Colors.red,
                           ),
-                          onPressed:()=> _onPressedRemoved(index),
+                          onPressed:()=> _OnPressedRemoved(index),
                         ),
                         IconButton(
                           icon: Icon(
-                            Icons.update,
+                            Icons.edit,
                             color: Colors.blue,
                           ),
-                          onPressed: () => _onPressedUpdate(index),
+                          onPressed: () => _OnPressedUpdate(index),
                         )
                       ],
                     ),
@@ -89,7 +93,7 @@ class __bodyBuilderState extends State<_bodyBuilder> {
           },
         ));
   }
-  _onPressAdd(){
+  _OnPressAdd(){
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -116,14 +120,14 @@ class __bodyBuilderState extends State<_bodyBuilder> {
         });
   }
 
-  _onPressedRemoved(int index){
+  _OnPressedRemoved(int index){
     setState(() {
       todos.removeAt(index);
       ref.setStringList('todo', todos);
     });
   }
 
-  _onPressedUpdate(int index){
+  _OnPressedUpdate(int index){
     String todo = todos[index];
     showDialog(
         context: context,
